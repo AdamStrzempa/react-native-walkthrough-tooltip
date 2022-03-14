@@ -94,6 +94,7 @@ const computeTopGeometry = ({
   displayInsets,
   windowDims,
   childContentSpacing,
+  customArrowPosition
 }) => {
   const maxWidth =
     windowDims.width - (displayInsets.left + displayInsets.right);
@@ -162,6 +163,7 @@ const computeBottomGeometry = ({
   displayInsets,
   windowDims,
   childContentSpacing,
+  customArrowPosition
 }) => {
   const maxWidth =
     windowDims.width - (displayInsets.left + displayInsets.right);
