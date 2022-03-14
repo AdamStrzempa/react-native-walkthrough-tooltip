@@ -22,6 +22,7 @@ import {
 } from './geom';
 import styleGenerator from './styles';
 import TooltipChildrenContext from './tooltip-children.context';
+import Arrow from './svg/arrowTooltip.svg'
 
 export { TooltipChildrenContext };
 
@@ -75,6 +76,9 @@ class Tooltip extends Component {
     useReactNativeModal: true,
     topAdjustment: 0,
     accessible: true,
+    customArrow: null,
+    customArrowPosition: 0,
+    containerMarginSize: 0
   };
 
   static propTypes = {
@@ -114,7 +118,6 @@ class Tooltip extends Component {
 
     this.isMeasuringChild = false;
     this.interactionPromise = null;
-    this.dimensionsSubscription = null;
 
     this.childWrapper = React.createRef();
     this.state = {
@@ -138,10 +141,7 @@ class Tooltip extends Component {
   }
 
   componentDidMount() {
-    this.dimensionsSubscription = Dimensions.addEventListener(
-      'change',
-      this.updateWindowDims,
-    );
+    Dimensions.addEventListener('change', this.updateWindowDims);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -161,16 +161,7 @@ class Tooltip extends Component {
   }
 
   componentWillUnmount() {
-    // removeEventListener deprecated
-    // https://reactnative.dev/docs/dimensions#removeeventlistener
-    if (Dimensions.removeEventListener) {
-      // react native < 0.65.*
-      Dimensions.removeEventListener('change', this.updateWindowDims);
-    } else if (this.dimensionsSubscription) {
-      // react native >= 0.65.*
-      this.dimensionsSubscription.remove();
-    }
-
+    Dimensions.removeEventListener('change', this.updateWindowDims);
     if (this.interactionPromise) {
       this.interactionPromise.cancel();
     }
@@ -299,7 +290,7 @@ class Tooltip extends Component {
   };
 
   computeGeometry = () => {
-    const { arrowSize, childContentSpacing } = this.props;
+    const { arrowSize, childContentSpacing, customArrowPosition } = this.props;
     const {
       childRect,
       contentSize,
@@ -318,6 +309,7 @@ class Tooltip extends Component {
           : swapSizeDimmensions(arrowSize),
       contentSize,
       childContentSpacing,
+      customArrowPosition
     };
 
     let geom = computeTopGeometry(options);
@@ -380,11 +372,11 @@ class Tooltip extends Component {
               alignItems: 'center',
               justifyContent: 'center',
             },
-            this.props.childrenWrapperStyle,
+            this.props.childrenWrapperStyle, 
           ]}
         >
           {this.props.children}
-        </View>
+        </View> 
       </TooltipChildrenContext.Provider>
     );
   };
@@ -410,18 +402,23 @@ class Tooltip extends Component {
       }
     };
 
+    const { placement, customArrow, containerMarginSize } = this.props
+
     return (
-      <TouchableWithoutFeedback
-        onPress={this.props.onClose}
-        accessible={this.props.accessible}
-      >
+
         <View style={generatedStyles.containerStyle}>
+        
           <View style={[generatedStyles.backgroundStyle]}>
-            <View style={generatedStyles.tooltipStyle}>
-              {hasChildren ? <View style={generatedStyles.arrowStyle} /> : null}
+            <View style={[generatedStyles.tooltipStyle, 
+              { marginTop: placement === "bottom" ? -containerMarginSize
+                : placement === "top" ? containerMarginSize : 0 } ]}>
+              {hasChildren ? 
+                  <View style={generatedStyles.arrowStyle}>
+                    {customArrow || null}
+                    </View> : null}
               <View
                 onLayout={this.measureContent}
-                style={generatedStyles.contentStyle}
+                style={[generatedStyles.contentStyle]}
               >
                 <TouchableWithoutFeedback
                   onPress={onPressContent}
@@ -431,22 +428,16 @@ class Tooltip extends Component {
                 </TouchableWithoutFeedback>
               </View>
             </View>
-          </View>
-          {hasChildren && this.props.showChildInTooltip
+            {hasChildren && this.props.showChildInTooltip
             ? this.renderChildInTooltip()
             : null}
+          </View>
         </View>
-      </TouchableWithoutFeedback>
     );
   };
 
   render() {
-    const {
-      children,
-      isVisible,
-      useReactNativeModal,
-      modalComponent,
-    } = this.props;
+    const { children, isVisible, useReactNativeModal, modalComponent } = this.props;
 
     const hasChildren = React.Children.count(children) > 0;
     const showTooltip = isVisible && !this.state.waitingForInteractions;

@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
   tooltip: {
     backgroundColor: 'transparent',
     position: 'absolute',
+    zIndex: 1
   },
   shadow: {
     shadowColor: 'black',
@@ -35,6 +36,8 @@ const styles = StyleSheet.create({
     borderRightColor: 'transparent',
     borderBottomColor: 'transparent',
     borderLeftColor: 'transparent',
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
 });
 

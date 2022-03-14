@@ -117,7 +117,7 @@ const computeTopGeometry = ({
   );
 
   const anchorPoint = new Point(
-    childRect.x + childRect.width / 2.0,
+    childRect.x + childRect.width + customArrowPosition,
     childRect.y - childContentSpacing,
   );
 
@@ -184,7 +184,7 @@ const computeBottomGeometry = ({
     ),
   );
   const anchorPoint = new Point(
-    childRect.x + childRect.width / 2.0,
+    childRect.x + childRect.width + customArrowPosition,
     childRect.y + childRect.height + childContentSpacing,
   );
 
