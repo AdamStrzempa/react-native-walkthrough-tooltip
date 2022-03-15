@@ -78,6 +78,12 @@ declare module 'react-native-walkthrough-tooltip' {
     // Callback fired when the user taps the tooltip background overlay
     onClose?: (event: GestureResponderEvent) => void;
 
+    customArrow?: JSX.Element;
+    
+    customArrowPosition?: number;
+    
+    containerMarginSize?: number;
+
     /**
      * Where to position the tooltip - options: top, bottom, left, right, center.
      * Default is 'top' for tooltips rendered with children. Default is 'center' for tooltips
