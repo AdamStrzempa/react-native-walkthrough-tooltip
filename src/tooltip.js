@@ -228,8 +228,10 @@ class Tooltip extends Component {
   };
 
   measureContent = e => {
+    const stateWidth = this.state.contentSize.width
+    const stateHeight = this.state.contentSize.height
     const { width, height } = e.nativeEvent.layout;
-    const contentSize = new Size(width, height);
+    const contentSize = stateWidth !== 0 && stateHeight !== 0 ? new Size(stateWidth, stateHeight) : new Size(width, height);
     this.setState({ contentSize }, () => {
       this.computeGeometry();
     });
@@ -404,11 +406,9 @@ class Tooltip extends Component {
     const { placement, customArrow, containerMarginSize } = this.props
 
     return (
-
         <View style={generatedStyles.containerStyle}>
-        
           <View style={[generatedStyles.backgroundStyle]}>
-            <View style={[generatedStyles.tooltipStyle, 
+            <View style={[generatedStyles.tooltipStyle,
               { marginTop: placement === "bottom" ? -containerMarginSize
                 : placement === "top" ? containerMarginSize : 0 } ]}>
               {hasChildren ? 
@@ -417,7 +417,7 @@ class Tooltip extends Component {
                     </View> : null}
               <View
                 onLayout={this.measureContent}
-                style={[generatedStyles.contentStyle]}
+                style={[generatedStyles.contentStyle, { minHeight: 100}]}
               >
                 <TouchableWithoutFeedback
                   onPress={onPressContent}
@@ -448,7 +448,7 @@ class Tooltip extends Component {
           <ModalComponent
             transparent
             visible={showTooltip}
-            onRequestClose={this.props.onClose}
+            onRequestClose={() => this.props.onClose}
             supportedOrientations={this.props.supportedOrientations}
           >
             {this.renderContentForTooltip()}
